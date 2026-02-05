@@ -1,0 +1,24 @@
+#!/usr/bin/env sh
+
+set -e
+
+APP_HOME=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+WRAPPER_JAR="$APP_HOME/gradle/wrapper/gradle-wrapper.jar"
+DIST_URL="https://services.gradle.org/distributions/gradle-8.4-bin.zip"
+
+bootstrap_wrapper_jar() {
+  mkdir -p "$APP_HOME/gradle/wrapper"
+  TMP_ZIP=$(mktemp)
+  curl -fsSL "$DIST_URL" -o "$TMP_ZIP"
+  if ! unzip -p "$TMP_ZIP" "gradle-8.4/lib/gradle-wrapper.jar" > "$WRAPPER_JAR"; then
+    unzip -p "$TMP_ZIP" "gradle-8.4/lib/plugins/gradle-wrapper-8.4.jar" > "$WRAPPER_JAR"
+  fi
+  rm -f "$TMP_ZIP"
+}
+
+if [ ! -f "$WRAPPER_JAR" ]; then
+  echo "gradle-wrapper.jar missing; bootstrapping from $DIST_URL"
+  bootstrap_wrapper_jar
+fi
+
+exec java -classpath "$WRAPPER_JAR" org.gradle.wrapper.GradleWrapperMain "$@"

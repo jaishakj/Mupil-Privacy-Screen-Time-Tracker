@@ -1,0 +1,25 @@
+name: Flutter Docker CI
+
+on:
+  push:
+    paths:
+      - 'mupil_flutter/**'
+      - 'Dockerfile'
+      - '.github/workflows/flutter-docker-ci.yml'
+  pull_request:
+
+jobs:
+  build-debug-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t mupil-builder .
+      - name: Build debug APK in container
+        run: |
+          docker run --rm -v "$PWD":/workspace mupil-builder
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: mupil-debug-apk
+          path: mupil_flutter/build/app/outputs/flutter-apk/app-debug.apk
