@@ -20,4 +20,4 @@ RUN yes | sdkmanager --licenses && \
 RUN git clone https://github.com/flutter/flutter.git -b stable ${FLUTTER_HOME}
 
 WORKDIR /workspace/mupil_flutter
-CMD ["bash", "-lc", "flutter doctor -v && flutter pub get && flutter build apk --debug -v"]
+CMD ["bash", "-lc", "flutter doctor -v && flutter pub get && flutter build apk --debug --no-tree-shake-icons"]
